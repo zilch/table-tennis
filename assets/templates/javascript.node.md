@@ -5,7 +5,6 @@ node main.js
 ```json file=/.devcontainer.json hidden=true
 {
   "name": "Zilch Bot",
-  "image": "mcr.microsoft.com/vscode/devcontainers/javascript-node:18",
   "postAttachCommand": "./connect --welcome",
   "customizations": {
     "codespaces": {
@@ -48,8 +47,26 @@ function send(channel, botInstanceId, payload) {
   process.stderr.write(message);
 }
 
-function parseBoard(board) {
-  return board.split("|").map((row) => row.split(","));
+function parsePayload(payload) {
+  const [eastPaddleX, eastPaddleY, westPaddleX, westPaddleY, ballX, ballY] =
+    payload.split(",").map((value) => {
+      return parseFloat(value);
+    });
+
+  return [
+    {
+      x: eastPaddleX,
+      y: eastPaddleY,
+    },
+    {
+      x: westPaddleX,
+      y: westPaddleY,
+    },
+    {
+      x: ballX,
+      y: ballY,
+    },
+  ];
 }
 
 const bots = new Map();
@@ -69,10 +86,7 @@ process.stdin.on("data", async (chunk) => {
       botInstanceId,
       gameTimeLimit: parseInt(standardConfigParts[0]),
       turnTimeLimit: parseInt(standardConfigParts[1]),
-      player: standardConfigParts[2] === "0" ? "x" : "o",
-      startingPosition: parseBoard(
-        payload.slice(standardCustomConfigSplit + 1)
-      ),
+      paddle: standardConfigParts[2] === "0" ? "east" : "west",
     };
 
     bots.set(botInstanceId, new Bot(config));
@@ -88,13 +102,13 @@ process.stdin.on("data", async (chunk) => {
   }
 
   if (channel === "move") {
-    const move = await bot.move(parseBoard(payload));
-    send("move", botInstanceId, `${move.x},${move.y}`);
+    const move = await bot.move(...parsePayload(payload));
+    send("move", botInstanceId, move);
     return;
   }
 
   if (channel === "end") {
-    await bot.end(parseBoard(payload));
+    await bot.end(...parsePayload(payload));
     bots.delete(botInstanceId);
     return;
   }
@@ -104,7 +118,7 @@ send("ready");
 ```
 
 ```js file=/bot.js
-// 👉 Run "./connect" (or "connect.cmd" on Windows) in the terminal to get started
+// 👉 Run "./connect" (or "connect.cmd" on Windows) in the terminal to get started.
 
 class Bot {
   constructor(config) {
@@ -112,16 +126,22 @@ class Bot {
     console.log("Hello world!", this.config);
   }
 
-  move(board) {
-    console.log(board); // 3x3 array with values "x" or "o" or "empty"
+  move(eastPaddle, westPaddle, ball) {
+    // Determine which paddle you control.
+    const paddle = this.config.paddle === "east" ? eastPaddle : westPaddle;
 
-    // Return the spot you'd like to move here.
-    // x should be an integer between 0 and 2
-    // y should be an integer between 0 and 2
-    return { x: 0, y: 0 };
+    // This prints the position of your paddle and the ball to the bot terminal.
+    // Use these values to determine which direction your paddle should move so
+    // you hit the ball!
+    console.log("paddle", paddle.x, paddle.y);
+    console.log("ball", ball.x, ball.y);
+
+    // Return the direction you'd like to move here:
+    // "north" "south" "east" "west" or "none"
+    return "none";
   }
 
-  end(board) {
+  end(eastPaddle, westPaddle, ball) {
     console.log("Good game!");
   }
 }

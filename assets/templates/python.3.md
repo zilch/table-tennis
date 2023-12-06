@@ -5,7 +5,6 @@ python3 -u ./main.py
 ```json file=/.devcontainer.json hidden=true
 {
   "name": "Zilch Bot",
-  "image": "mcr.microsoft.com/devcontainers/python:3.11",
   "postAttachCommand": "./connect --welcome",
   "customizations": {
     "codespaces": {
