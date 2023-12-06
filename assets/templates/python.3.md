@@ -47,11 +47,22 @@ def send(channel: str, *args):
 
     print(message, end="", file=sys.stderr)
 
-def parse_board(board):
-    return list(map(
-        lambda row: row.split(","),
-        board.split("|")
-    ))
+def parse_payload(payload):
+    parts = payload.split(",")
+    return [
+        {
+            "x": float(parts[0]),
+            "y": float(parts[1])
+        },
+        {
+            "x": float(parts[2]),
+            "y": float(parts[3])
+        },
+        {
+            "x": float(parts[4]),
+            "y": float(parts[5])
+        }
+    ]
 
 send("ready")
 
@@ -68,8 +79,7 @@ while True:
             "bot_instance_id": bot_instance_id,
             "game_time_limit": int(game_time_limit),
             "turn_time_limit": int(turn_time_limit),
-            "player": "x" if player == "0" else "o",
-            "starting_position": parse_board(custom_config)
+            "paddle": "east" if player == "0" else "west"
         }
         bots[bot_instance_id] = Bot(config)
         send("start", bot_instance_id)
@@ -77,32 +87,39 @@ while True:
 
     if channel == "move":
         bot = bots[bot_instance_id]
-        x, y = bot.move(parse_board(payload))
-        send("move", bot_instance_id, str(x) + "," + str(y))
+        move = bot.move(parse_payload(payload))
+        send("move", bot_instance_id, move)
         continue
 
     if channel == "end":
         bot = bots[bot_instance_id]
-        bot.end(parse_board(payload))
+        bot.end(parse_payload(payload))
         bots.pop(bot_instance_id)
         continue
 ```
 
 ```py file=/bot.py
 # 👉 Run "./connect" (or "connect.cmd" on Windows) in the terminal to get started
+
 class Bot:
     def __init__(self, config):
         print("Hello World!", config)
-        pass
+        self.config = config
 
-    def move(self, board):
-        print(board)  # 3x3 array with values "x" or "o" or "empty"
+    def move(self, eastPaddle, westPaddle, ball):
+        # Determine which paddle you control.
+        paddle = eastPaddle if self.config.paddle == "east" else westPaddle
 
-        # Return the spot you'd like to move here.
-        # 1st value: x, should be an integer between 0 and 2
-        # 2nd value: y, should be an integer between 0 and 2
-        return (0, 1)
+        # This prints the position of your paddle and the ball to the bot terminal.
+        # Use these values to determine which direction your paddle should move so
+        # you hit the ball!
+        print("paddle", paddle["x"], paddle["y"])
+        print("ball", ball["x"], ball["y"])
 
-    def end(self, board):
+        # Return the direction you'd like to move here:
+        # "north" "south" "east" "west" or "none"
+        return "none"
+
+    def end(self, eastPaddle, westPaddle, ball):
         print("Good game!")
 ```
