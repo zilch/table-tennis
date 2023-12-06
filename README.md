@@ -1,1 +1,6 @@
-# table-tennis
+# Getting Started
+
+```
+npm install
+npm start
+```
