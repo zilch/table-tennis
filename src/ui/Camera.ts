@@ -45,7 +45,7 @@ export class Camera {
         property: "radius",
         frames: {
           0: this.#camera.radius,
-          90: 22,
+          90: 24,
         },
         easingFunction: new BackEase(),
         easingMode: "out",

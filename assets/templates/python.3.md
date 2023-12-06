@@ -87,13 +87,13 @@ while True:
 
     if channel == "move":
         bot = bots[bot_instance_id]
-        move = bot.move(parse_payload(payload))
+        move = bot.move(*parse_payload(payload))
         send("move", bot_instance_id, move)
         continue
 
     if channel == "end":
         bot = bots[bot_instance_id]
-        bot.end(parse_payload(payload))
+        bot.end(*parse_payload(payload))
         bots.pop(bot_instance_id)
         continue
 ```
@@ -108,7 +108,7 @@ class Bot:
 
     def move(self, eastPaddle, westPaddle, ball):
         # Determine which paddle you control.
-        paddle = eastPaddle if self.config.paddle == "east" else westPaddle
+        paddle = eastPaddle if self.config["paddle"] == "east" else westPaddle
 
         # This prints the position of your paddle and the ball to the bot terminal.
         # Use these values to determine which direction your paddle should move so
