@@ -34,7 +34,7 @@ Zilch.play = async function* (game) {
     annotations: [],
     lastBall: null,
     ball: {
-      speed: 8,
+      speed: 10,
       intercept: null,
       hit: initialHit,
       angle: initialAngle,
@@ -232,17 +232,17 @@ function handlePaddleHit(
   const forwardPaddleVelocity =
     (player === "p1" && paddleVelocity.x > 0) ||
     (player === "p2" && paddleVelocity.x < 0);
-  const nearNet = Math.abs(state[player].position.x) < 20;
+  const nearNet = Math.abs(state[player].position.x) < 24;
   let yHitWindow = 10;
   if (nearNet) {
-    yHitWindow *= 1.5;
+    yHitWindow *= 1.4;
   }
   if (forwardPaddleVelocity) {
-    yHitWindow *= 1.5;
+    yHitWindow *= 1.4;
   }
 
   const landPoint: Point = {
-    x: (Math.random() * 9 + 10) * (player === "p1" ? 1 : -1),
+    x: (Math.random() * 11.8 + 11.8) * (player === "p1" ? 1 : -1),
     y: Math.random() * yHitWindow - yHitWindow / 2,
   };
 
@@ -267,17 +267,9 @@ function handlePaddleHit(
     (paddleVelocity.x < 0 && player === "p2") ||
     (paddleVelocity.x > 0 && player === "p1")
   ) {
-    state.ball.speed *= 1.05;
+    state.ball.speed *= 1.07;
   } else {
-    if (state.ball.speed > 10) {
-      state.ball.speed *= 0.98;
-    } else {
-      state.ball.speed *= 1.01;
-    }
-  }
-
-  if (state.ball.speed > 12) {
-    state.ball.speed = 12;
+    state.ball.speed *= 1.01;
   }
 
   const remainingSpeed = state.ball.speed * (1 - intercept.time);
@@ -329,31 +321,21 @@ function getMoveVelocity(
         : -speed,
   };
 
-  const newX = velocity.x + paddlePosition.x;
-  const netLimit = 6;
-  const backLimit = 45;
-  let limitHit = false;
+  const netLimit = 23.6;
+  const backLimit = 42;
 
   if (player === "p1") {
-    if (newX > -netLimit) {
-      limitHit = true;
+    if (paddlePosition.x + velocity.x > -netLimit) {
       velocity.x = -netLimit - paddlePosition.x;
-    } else if (newX < -backLimit) {
-      limitHit = true;
+    } else if (paddlePosition.x + velocity.x < -backLimit) {
       velocity.x = -backLimit - paddlePosition.x;
     }
   } else {
-    if (newX < netLimit) {
-      limitHit = true;
+    if (paddlePosition.x + velocity.x < netLimit) {
       velocity.x = netLimit - paddlePosition.x;
-    } else if (newX > backLimit) {
-      limitHit = true;
+    } else if (paddlePosition.x + velocity.x > backLimit) {
       velocity.x = backLimit - paddlePosition.x;
     }
-  }
-
-  if (limitHit) {
-    previousMoves.splice(0, previousMoves.length);
   }
 
   return velocity;

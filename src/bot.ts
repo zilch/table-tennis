@@ -4,10 +4,12 @@ import { Move } from "./play";
 Zilch.Bot = class Bot {
   params: StartBotParams;
 
+  lastPaddleY: number = 0;
   lastBallX: number = 0;
   lastBallY: number = 0;
   lastBallComingTowardPaddle = false;
   hasHitBall = false;
+  moveTowardNet = false;
 
   constructor(params: StartBotParams) {
     this.params = params;
@@ -21,11 +23,15 @@ Zilch.Bot = class Bot {
     const state = parsePayload(payload);
     const isP1 = this.params.botIndex === 0;
     const player = isP1 ? state.p1 : state.p2;
-    const otherPlayer = isP1 ? state.p2 : state.p1;
+
+    const ballVelocity = {
+      x: state.ball.x - this.lastBallX,
+      y: state.ball.y - this.lastBallY,
+    };
 
     const ballComingTowardsPaddle = isP1
-      ? state.ball.x < this.lastBallX
-      : state.ball.x > this.lastBallX;
+      ? ballVelocity.x < 0
+      : ballVelocity.x > 0;
 
     if (!ballComingTowardsPaddle && this.lastBallComingTowardPaddle) {
       this.hasHitBall = true;
@@ -76,21 +82,30 @@ Zilch.Bot = class Bot {
       }
     } else if (this.params.type == "boss-hard") {
       if (ballComingTowardsPaddle) {
-        if (Math.abs(state.ball.y - player.y) < 1) {
+        const m = ballVelocity.x === 0 ? 0 : -ballVelocity.y / ballVelocity.x;
+        const b = state.ball.x * m + state.ball.y;
+        const yIntercept = -m * player.x + b;
+
+        this.moveTowardNet = Math.random() > 0.4;
+
+        if (Math.abs(yIntercept - player.y) < 1) {
           move = "none";
-        } else if (state.ball.y < player.y) {
+        } else if (yIntercept < player.y) {
           move = "south";
-        } else {
+        } else if (yIntercept > player.y) {
           move = "north";
+        } else {
+          move = "none";
         }
       } else {
-        if (
-          Math.abs(player.x) > 10 &&
-          Math.abs(player.x - otherPlayer.x) > 30
-        ) {
+        if (player.y > 1) {
+          move = "south";
+        } else if (player.y < -1) {
+          move = "north";
+        } else if (!this.moveTowardNet && Math.abs(player.x) < 38) {
+          move = isP1 ? "east" : "west";
+        } else if (this.moveTowardNet && Math.abs(player.x) > 20) {
           move = isP1 ? "west" : "east";
-        } else if (Math.abs(player.y) > 2) {
-          move = player.y > 0 ? "south" : "north";
         } else {
           move = "none";
         }
@@ -100,6 +115,7 @@ Zilch.Bot = class Bot {
     this.lastBallComingTowardPaddle = ballComingTowardsPaddle;
     this.lastBallX = state.ball.x;
     this.lastBallY = state.ball.y;
+    this.lastPaddleY = player.y;
 
     return move;
   }

@@ -55,7 +55,7 @@ function getY(a: number, x: number, hitPoint: Point, landX: number) {
 }
 
 export function getBallZ(ballX: number, { hitX, hitZ, landX }: Hit) {
-  let aDenominator = 20;
+  let aDenominator = 30;
 
   for (; aDenominator > 0; aDenominator -= 5) {
     if (
