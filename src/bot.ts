@@ -7,8 +7,8 @@ Zilch.Bot = class Bot {
   lastPaddleY: number = 0;
   lastBallX: number = 0;
   lastBallY: number = 0;
+  ballHitCount: number = 0;
   lastBallComingTowardPaddle = false;
-  hasHitBall = false;
   moveTowardNet = false;
 
   constructor(params: StartBotParams) {
@@ -34,81 +34,67 @@ Zilch.Bot = class Bot {
       : ballVelocity.x > 0;
 
     if (!ballComingTowardsPaddle && this.lastBallComingTowardPaddle) {
-      this.hasHitBall = true;
+      this.ballHitCount++;
     }
 
     let move = "none";
 
-    if (this.params.type === "practice") {
-      if (Math.random() < 0.5 && this.hasHitBall) {
-        const moves = ["south", "north", "east", "west"];
+    if (
+      (this.params.type === "practice" && this.ballHitCount > 0) ||
+      (this.params.type === "boss-easy" && this.ballHitCount > 2) ||
+      (this.params.type === "boss-medium" && this.ballHitCount > 14)
+    ) {
+      if (this.params.type === "practice" && Math.random() < 0.5) {
+        const moves = ["north", "south", "east", "west", "none"];
         move = moves[Math.floor(Math.random() * moves.length)];
-      } else if (Math.abs(state.ball.y - player.y) < 2) {
+      } else if (ballComingTowardsPaddle) {
+        if (Math.abs(state.ball.y - player.y) < 1) {
+          move = "none";
+        } else if (state.ball.y < player.y) {
+          move = "south";
+        } else if (state.ball.y > player.y) {
+          move = "north";
+        } else {
+          move = "none";
+        }
+      } else {
         move = "none";
-      } else if (state.ball.y < player.y) {
-        move = "south";
-      } else {
-        move = "north";
       }
-    } else if (this.params.type === "boss-easy") {
-      if (Math.abs(state.ball.y - player.y) < 2) {
+    } else if (ballComingTowardsPaddle) {
+      const m = ballVelocity.x === 0 ? 0 : -ballVelocity.y / ballVelocity.x;
+      const b = state.ball.x * m + state.ball.y;
+      const yIntercept = -m * player.x + b;
+
+      this.moveTowardNet = Math.random() > 0.5;
+
+      if (Math.abs(yIntercept - player.y) < 1.5) {
         move = "none";
-      } else if (state.ball.y < player.y) {
+      } else if (yIntercept < player.y) {
         move = "south";
-      } else {
+      } else if (yIntercept > player.y) {
         move = "north";
-      }
-    } else if (this.params.type === "boss-medium") {
-      if (ballComingTowardsPaddle) {
-        if (Math.abs(player.y - state.ball.y) < 1) {
-          if (isP1 ? player.x < -5 : player.x > 5) {
-            move = isP1 ? "west" : "east";
-          } else {
-            move = "none";
-          }
-        } else if (player.y > state.ball.y) {
-          move = "south";
-        } else {
-          move = "north";
-        }
       } else {
-        if (Math.abs(player.y) > 2) {
-          move = player.y > 0 ? "south" : "north";
-        } else if (Math.abs(player.x) < 40) {
-          move = isP1 ? "east" : "west";
-        } else {
-          move = "none";
-        }
+        move = "none";
       }
-    } else if (this.params.type == "boss-hard") {
-      if (ballComingTowardsPaddle) {
-        const m = ballVelocity.x === 0 ? 0 : -ballVelocity.y / ballVelocity.x;
-        const b = state.ball.x * m + state.ball.y;
-        const yIntercept = -m * player.x + b;
-
-        this.moveTowardNet = Math.random() > 0.4;
-
-        if (Math.abs(yIntercept - player.y) < 1) {
-          move = "none";
-        } else if (yIntercept < player.y) {
-          move = "south";
-        } else if (yIntercept > player.y) {
-          move = "north";
-        } else {
-          move = "none";
-        }
+    } else {
+      if (player.y > 1) {
+        move = "south";
+      } else if (player.y < -1) {
+        move = "north";
+      } else if (
+        this.params.type !== "boss-easy" &&
+        !this.moveTowardNet &&
+        Math.abs(player.x) < 38
+      ) {
+        move = isP1 ? "east" : "west";
+      } else if (
+        this.params.type !== "boss-easy" &&
+        this.moveTowardNet &&
+        Math.abs(player.x) > 20
+      ) {
+        move = isP1 ? "west" : "east";
       } else {
-        if (player.y > 1) {
-          move = "south";
-        } else if (player.y < -1) {
-          move = "north";
-        } else if (!this.moveTowardNet && Math.abs(player.x) < 38) {
-          move = isP1 ? "east" : "west";
-        } else if (this.moveTowardNet && Math.abs(player.x) > 20) {
-          move = isP1 ? "west" : "east";
-        } else {
-          move = "none";
-        }
+        move = "none";
       }
     }
 

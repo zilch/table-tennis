@@ -267,9 +267,9 @@ function handlePaddleHit(
     (paddleVelocity.x < 0 && player === "p2") ||
     (paddleVelocity.x > 0 && player === "p1")
   ) {
-    state.ball.speed *= 1.07;
+    state.ball.speed *= 1.1;
   } else {
-    state.ball.speed *= 1.01;
+    state.ball.speed *= 1.02;
   }
 
   const remainingSpeed = state.ball.speed * (1 - intercept.time);

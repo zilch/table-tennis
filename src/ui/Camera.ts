@@ -28,7 +28,7 @@ export class Camera {
       "camera",
       INITIAL_ALPHA,
       INITIAL_BETA,
-      16.5,
+      18,
       new Vector3(0, 3, 0),
       scene
     );
@@ -45,7 +45,7 @@ export class Camera {
         property: "radius",
         frames: {
           0: this.#camera.radius,
-          90: 24,
+          90: 27,
         },
         easingFunction: new BackEase(),
         easingMode: "out",
