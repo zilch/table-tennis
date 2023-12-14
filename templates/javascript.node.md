@@ -108,6 +108,7 @@ send("ready");
 ```js file=/bot.js
 // 👋 Hello there! This file contains ready-to-edit bot code.
 // 🟢 Open "README.md" for instructions on how to get started!
+// TL;DR Run ./connect (or .\connect.cmd on Windows) to begin.
 
 class Bot {
   constructor(config) {
