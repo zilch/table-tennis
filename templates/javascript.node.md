@@ -2,19 +2,7 @@
 node main.js
 ```
 
-```json file=/.devcontainer.json hidden=true
-{
-  "name": "Zilch Bot",
-  "postAttachCommand": "./connect --welcome",
-  "customizations": {
-    "codespaces": {
-      "openFiles": ["bot.js"]
-    }
-  }
-}
-```
-
-```md file=/README.md hidden=true
+```md file=/README.md
 Check if you have Node.js installed on your system like this:
 
 \`\`\`
@@ -118,7 +106,8 @@ send("ready");
 ```
 
 ```js file=/bot.js
-// 👉 Run "./connect" (or "connect.cmd" on Windows) in the terminal to get started.
+// 👋 Hello there! This file contains ready-to-edit bot code.
+// 🟢 Open "README.md" for instructions on how to get started!
 
 class Bot {
   constructor(config) {
