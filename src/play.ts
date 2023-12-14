@@ -171,6 +171,8 @@ interface Velocity {
   y: number;
 }
 
+// TODO sometimes ball suddenly changes direction in the middle of the table - not sure why
+// or how to reliably reproduce.
 function moveBall(state: State, p1Velocity: Velocity, p2Velocity: Velocity) {
   if (
     handlePaddleHit(state, p1Velocity, "p1") ||
