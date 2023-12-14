@@ -2,21 +2,6 @@
 python3 -u ./main.py
 ```
 
-```json file=/.devcontainer.json hidden=true
-{
-  "name": "Zilch Bot",
-  "postAttachCommand": "./connect --welcome",
-  "customizations": {
-    "codespaces": {
-      "openFiles": ["bot.py"]
-    },
-    "vscode": {
-      "extensions": ["ms-python.python"]
-    }
-  }
-}
-```
-
 ```md file=/README.md hidden=true
 Check if you have Python 3 installed on your system like this:
 
@@ -102,7 +87,9 @@ while True:
 ```
 
 ```py file=/bot.py
-# 👉 Run "./connect" (or "connect.cmd" on Windows) in the terminal to get started
+# 👋 Hello there! This file contains ready-to-edit bot code.
+# 🟢 Open "README.md" for instructions on how to get started!
+# TL;DR Run ./connect (or .\connect.cmd on Windows) to begin.
 
 class Bot:
     def __init__(self, config):
