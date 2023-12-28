@@ -19,50 +19,29 @@ bot directory to play.
 // ⚠️ Only modify this file if you know what you're doing!
 const { Bot } = require("./bot");
 
-function send(channel, botInstanceId, payload) {
-  let message = `\n<<zilch>>.${channel}`;
-
-  if (botInstanceId) {
-    message += "." + botInstanceId;
-  }
-
-  if (payload) {
-    message += "." + payload;
-  }
-
-  message += "\n";
-
-  process.stderr.write(message);
+function send(channel, payload) {
+  process.stderr.write(
+    `\n<<zilch>>.${channel}${payload ? "." + payload : ""}\n`
+  );
 }
 
 function parsePayload(payload) {
-  const [eastPaddleX, eastPaddleY, westPaddleX, westPaddleY, ballX, ballY] =
-    payload.split(",").map((value) => {
-      return parseFloat(value);
-    });
+  const [paddleX, paddleY, ballX, ballY] = payload
+    .split(",")
+    .map((value) => parseFloat(value));
 
   return [
-    {
-      x: eastPaddleX,
-      y: eastPaddleY,
-    },
-    {
-      x: westPaddleX,
-      y: westPaddleY,
-    },
-    {
-      x: ballX,
-      y: ballY,
-    },
+    { x: paddleX, y: paddleY },
+    { x: ballX, y: ballY },
   ];
 }
 
-const bots = new Map();
+let bot;
 
 process.stdin.on("data", async (chunk) => {
   const data = chunk.toString().trim();
-  const [channel, botInstanceId] = data.split(".", 2);
-  const payload = data.slice(channel.length + botInstanceId.length + 2);
+  const channel = data.split(".")[0];
+  const payload = data.slice(channel.length + 1);
 
   if (channel === "start") {
     const standardCustomConfigSplit = payload.indexOf(".");
@@ -71,33 +50,29 @@ process.stdin.on("data", async (chunk) => {
       .split(",");
 
     const config = {
-      botInstanceId,
       gameTimeLimit: parseInt(standardConfigParts[0]),
       turnTimeLimit: parseInt(standardConfigParts[1]),
       paddle: standardConfigParts[2] === "0" ? "east" : "west",
     };
 
-    bots.set(botInstanceId, new Bot(config));
+    bot = new Bot(config);
 
-    send("start", botInstanceId);
+    send("start");
     return;
   }
 
-  const bot = bots.get(botInstanceId);
-
   if (!bot) {
-    throw new Error("No bot runner with id " + botInstanceId);
+    throw new Error("Bot not yet initialized.");
   }
 
   if (channel === "move") {
     const move = await bot.move(...parsePayload(payload));
-    send("move", botInstanceId, move);
+    send("move", move);
     return;
   }
 
   if (channel === "end") {
     await bot.end(...parsePayload(payload));
-    bots.delete(botInstanceId);
     return;
   }
 });
@@ -116,10 +91,7 @@ class Bot {
     console.log("Hello world!", this.config);
   }
 
-  move(eastPaddle, westPaddle, ball) {
-    // Determine which paddle you control.
-    const paddle = this.config.paddle === "east" ? eastPaddle : westPaddle;
-
+  move(paddle, ball) {
     // This prints the position of your paddle and the ball to the bot terminal.
     // Use these values to determine which direction your paddle should move so
     // you hit the ball!
@@ -131,7 +103,7 @@ class Bot {
     return "none";
   }
 
-  end(eastPaddle, westPaddle, ball) {
+  end(paddle, ball) {
     console.log("Good game!");
   }
 }

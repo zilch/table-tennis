@@ -1,6 +1,6 @@
 import { Bot, BotOutcome } from "zilch-game-engine";
 import { Chalk } from "chalk";
-import { Hit, Point, State } from "./config";
+import { Hit, Player, Point, State } from "./config";
 import { getBallZ, getCircleLineIntercept, zMultiplier } from "./ui/math";
 
 const chalk = new Chalk({ level: 3 });
@@ -65,8 +65,6 @@ Zilch.play = async function* (game) {
   const previousP2Moves: Move[] = [];
 
   while (true) {
-    const payload = createMovePayload(state);
-
     state.index++;
 
     const logMove = (bot: Bot) => {
@@ -83,11 +81,11 @@ Zilch.play = async function* (game) {
     game.bots[1].writeln(chalk.dim(`Start move`));
     const [p1Move, p2Move] = await Promise.all([
       game.bots[0]
-        .move(payload)
+        .move(createMovePayload(state, "p1"))
         .then(parseMoveResponse)
         .then(logMove(game.bots[0])),
       game.bots[1]
-        .move(payload)
+        .move(createMovePayload(state, "p2"))
         .then(parseMoveResponse)
         .then(logMove(game.bots[1])),
     ]);
@@ -359,12 +357,10 @@ function parseMoveResponse(response: string): Move | Error {
   }
 }
 
-function createMovePayload(state: State) {
+function createMovePayload(state: State, player: "p1" | "p2") {
   return [
-    state.p1.position.x,
-    state.p1.position.y,
-    state.p2.position.x,
-    state.p2.position.y,
+    state[player].position.x,
+    state[player].position.y,
     state.ball.position.x,
     state.ball.position.y,
   ].join(",");
