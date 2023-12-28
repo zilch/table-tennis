@@ -22,7 +22,6 @@ Zilch.Bot = class Bot {
   move(payload: string) {
     const state = parsePayload(payload);
     const isP1 = this.params.botIndex === 0;
-    const player = isP1 ? state.p1 : state.p2;
 
     const ballVelocity = {
       x: state.ball.x - this.lastBallX,
@@ -48,11 +47,11 @@ Zilch.Bot = class Bot {
         const moves = ["north", "south", "east", "west", "none"];
         move = moves[Math.floor(Math.random() * moves.length)];
       } else if (ballComingTowardsPaddle) {
-        if (Math.abs(state.ball.y - player.y) < 1) {
+        if (Math.abs(state.ball.y - state.paddle.y) < 1) {
           move = "none";
-        } else if (state.ball.y < player.y) {
+        } else if (state.ball.y < state.paddle.y) {
           move = "south";
-        } else if (state.ball.y > player.y) {
+        } else if (state.ball.y > state.paddle.y) {
           move = "north";
         } else {
           move = "none";
@@ -63,34 +62,34 @@ Zilch.Bot = class Bot {
     } else if (ballComingTowardsPaddle) {
       const m = ballVelocity.x === 0 ? 0 : -ballVelocity.y / ballVelocity.x;
       const b = state.ball.x * m + state.ball.y;
-      const yIntercept = -m * player.x + b;
+      const yIntercept = -m * state.paddle.x + b;
 
       this.moveTowardNet = Math.random() > 0.5;
 
-      if (Math.abs(yIntercept - player.y) < 1.5) {
+      if (Math.abs(yIntercept - state.paddle.y) < 1.5) {
         move = "none";
-      } else if (yIntercept < player.y) {
+      } else if (yIntercept < state.paddle.y) {
         move = "south";
-      } else if (yIntercept > player.y) {
+      } else if (yIntercept > state.paddle.y) {
         move = "north";
       } else {
         move = "none";
       }
     } else {
-      if (player.y > 1) {
+      if (state.paddle.y > 1) {
         move = "south";
-      } else if (player.y < -1) {
+      } else if (state.paddle.y < -1) {
         move = "north";
       } else if (
         this.params.type !== "boss-easy" &&
         !this.moveTowardNet &&
-        Math.abs(player.x) < 38
+        Math.abs(state.paddle.x) < 38
       ) {
         move = isP1 ? "east" : "west";
       } else if (
         this.params.type !== "boss-easy" &&
         this.moveTowardNet &&
-        Math.abs(player.x) > 20
+        Math.abs(state.paddle.x) > 20
       ) {
         move = isP1 ? "west" : "east";
       } else {
@@ -101,7 +100,7 @@ Zilch.Bot = class Bot {
     this.lastBallComingTowardPaddle = ballComingTowardsPaddle;
     this.lastBallX = state.ball.x;
     this.lastBallY = state.ball.y;
-    this.lastPaddleY = player.y;
+    this.lastPaddleY = state.paddle.y;
 
     return move;
   }
@@ -112,11 +111,11 @@ Zilch.Bot = class Bot {
 function parsePayload(payload: string) {
   const parts = payload.split(",");
 
-  if (parts.length !== 6) {
+  if (parts.length !== 4) {
     throw new Error("Unexpected payload");
   }
 
-  const [p1x, p1y, p2x, p2y, ballX, ballY] = parts.map((value) => {
+  const [paddleX, paddleY, ballX, ballY] = parts.map((value) => {
     const num = parseFloat(value);
 
     if (isNaN(num)) {
@@ -127,13 +126,9 @@ function parsePayload(payload: string) {
   });
 
   return {
-    p1: {
-      x: p1x,
-      y: p1y,
-    },
-    p2: {
-      x: p2x,
-      y: p2y,
+    paddle: {
+      x: paddleX,
+      y: paddleY,
     },
     ball: {
       x: ballX,
