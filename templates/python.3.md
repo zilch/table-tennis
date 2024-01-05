@@ -100,7 +100,7 @@ class Bot:
         print("Good game!")
 ```
 
-```py file=/.gitignore hidden=true
+```sh file=/.gitignore hidden=true
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
