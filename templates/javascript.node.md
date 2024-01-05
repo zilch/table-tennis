@@ -40,7 +40,7 @@ let bot;
 
 process.stdin.on("data", async (chunk) => {
   const data = chunk.toString().trim();
-  const channel = data.split(".")[0];
+  const channel = data.split(".", 1)[0];
   const payload = data.slice(channel.length + 1);
 
   if (channel === "start") {
