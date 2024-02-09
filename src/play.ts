@@ -11,8 +11,8 @@ Zilch.play = async function* (game) {
   const serveTo =
     game.config.serveTo === "random"
       ? Math.random() > 0.5
-        ? "east"
-        : "west"
+        ? "west"
+        : "east"
       : game.config.serveTo;
 
   const initialHit: Hit = {
@@ -23,7 +23,7 @@ Zilch.play = async function* (game) {
 
   let initialAngle = 0.3;
 
-  if (serveTo === "east") {
+  if (serveTo === "west") {
     initialAngle += Math.PI;
     initialHit.hitX *= -1;
     initialHit.landX *= -1;
@@ -310,7 +310,7 @@ function getMoveVelocity(
     x:
       move === "north" || move === "south"
         ? 0
-        : move === "east"
+        : move === "west"
         ? -speed
         : speed,
     y:

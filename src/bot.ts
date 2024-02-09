@@ -85,13 +85,13 @@ Zilch.Bot = class Bot {
         !this.moveTowardNet &&
         Math.abs(state.paddle.x) < 38
       ) {
-        move = isP1 ? "east" : "west";
+        move = isP1 ? "west" : "east";
       } else if (
         this.params.type !== "boss-easy" &&
         this.moveTowardNet &&
         Math.abs(state.paddle.x) > 20
       ) {
-        move = isP1 ? "west" : "east";
+        move = isP1 ? "east" : "west";
       } else {
         move = "none";
       }

@@ -62,7 +62,7 @@ Zilch.Renderer = class Renderer {
         wins: 0,
         lastMove: "none",
       },
-      "east"
+      "west"
     );
 
     const paddle2Mesh = this.#scene.meshes.find(
@@ -76,7 +76,7 @@ Zilch.Renderer = class Renderer {
         wins: 0,
         lastMove: "none",
       },
-      "west"
+      "east"
     );
 
     const ballMesh = this.#scene.meshes.find((mesh) => mesh.name === "Ball")!;
