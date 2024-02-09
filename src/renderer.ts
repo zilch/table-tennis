@@ -600,6 +600,10 @@ class Paddle {
 
 function getFinalFrame(scene: Scene) {
   const ms = 120;
-  const framesPerMillisecond = scene.getEngine().getFps() / 1000;
+  let fps = scene.getEngine().getFps();
+  if (Number.isNaN(fps) || !Number.isFinite(fps)) {
+    fps = 120;
+  }
+  const framesPerMillisecond = fps / 1000;
   return Math.round(ms * framesPerMillisecond);
 }
