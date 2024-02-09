@@ -52,7 +52,7 @@ process.stdin.on("data", async (chunk) => {
     const config = {
       gameTimeLimit: parseInt(standardConfigParts[0]),
       turnTimeLimit: parseInt(standardConfigParts[1]),
-      paddle: standardConfigParts[2] === "0" ? "east" : "west",
+      paddle: standardConfigParts[2] === "0" ? "west" : "east",
     };
 
     bot = new Bot(config);

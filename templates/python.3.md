@@ -59,7 +59,7 @@ while True:
         config = {
             "game_time_limit": int(game_time_limit),
             "turn_time_limit": int(turn_time_limit),
-            "paddle": "east" if player == "0" else "west"
+            "paddle": "west" if player == "0" else "east"
         }
         bot = Bot(config)
         send("start")
