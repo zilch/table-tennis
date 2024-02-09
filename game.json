@@ -1,7 +1,7 @@
 {
   "name": "Table Tennis",
   "v": 1,
-  "slots": ["East Paddle", "West Paddle"],
+  "slots": ["West Paddle", "East Paddle"],
   "minSlots": 2,
   "defaultTimeLimitMilliseconds": {
     "move": 100,
