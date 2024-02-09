@@ -2,8 +2,8 @@
   "name": "Table Tennis",
   "v": 1,
   "slots": [
-    "East Paddle",
-    "West Paddle"
+    "West Paddle",
+    "East Paddle"
   ],
   "minSlots": 2,
   "defaultTimeLimitMilliseconds": {
